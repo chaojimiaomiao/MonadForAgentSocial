@@ -122,13 +122,31 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <Button
-        android:id="@+id/btn_toggle_service"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="@string/btn_start_service"
-        android:backgroundTint="@color/teal_500"
-        android:textColor="@color/white"
-        android:layout_margin="16dp" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="16dp">
+
+        <Button
+            android:id="@+id/btn_settings"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="设置权限"
+            android:textSize="14sp"
+            android:textColor="@color/teal_500"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+        <Button
+            android:id="@+id/btn_toggle_service"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="2"
+            android:text="@string/btn_start_service"
+            android:backgroundTint="@color/teal_500"
+            android:textColor="@color/white"
+            android:layout_marginLeft="8dp" />
+    </LinearLayout>
 
 </LinearLayout>

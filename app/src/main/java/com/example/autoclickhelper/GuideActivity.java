@@ -29,6 +29,11 @@ public class GuideActivity extends AppCompatActivity {
 
         prefs = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE);
 
+        if (prefs.getBoolean("guide_completed", false)) {
+            goToMain();
+            return;
+        }
+
         accessibilityStatus = findViewById(R.id.accessibility_status);
         autostartStatus = findViewById(R.id.autostart_status);
         batteryStatus = findViewById(R.id.battery_status);
@@ -42,8 +47,8 @@ public class GuideActivity extends AppCompatActivity {
         btnAccessibility.setOnClickListener(v -> openAccessibilitySettings());
         btnAutostart.setOnClickListener(v -> openAutostartSettings());
         btnBattery.setOnClickListener(v -> openBatterySettings());
-        btnSkip.setOnClickListener(v -> goToMain());
-        btnDone.setOnClickListener(v -> goToMain());
+        btnSkip.setOnClickListener(v -> completeGuide());
+        btnDone.setOnClickListener(v -> completeGuide());
 
         checkPermissions();
     }
@@ -186,6 +191,11 @@ public class GuideActivity extends AppCompatActivity {
             fallback.setData(Uri.fromParts("package", getPackageName(), null));
             startActivity(fallback);
         }
+    }
+
+    private void completeGuide() {
+        prefs.edit().putBoolean("guide_completed", true).apply();
+        goToMain();
     }
 
     private void goToMain() {

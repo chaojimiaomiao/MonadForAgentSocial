@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         taskTime = findViewById(R.id.task_time);
 
         Button btnSetTime = findViewById(R.id.btn_set_time);
+        Button btnSettings = findViewById(R.id.btn_settings);
 
         String time = prefs.getString("task_time", "08:00");
         taskTime.setText(time);
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         btnToggleService.setOnClickListener(v -> toggleService());
         btnExecuteTask.setOnClickListener(v -> executeTask());
         btnSetTime.setOnClickListener(v -> showTimePicker());
+        btnSettings.setOnClickListener(v -> openSettings());
     }
 
     @Override
@@ -149,5 +151,12 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         alarmManager.cancel(pendingIntent);
+    }
+
+    private void openSettings() {
+        prefs.edit().putBoolean("guide_completed", false).apply();
+        Intent intent = new Intent(this, GuideActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
