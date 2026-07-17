@@ -70,29 +70,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         if (isExecuting)
             return;
         isExecuting = true;
-        currentStep = 0;
-        openPublicAccountHelper();
-    }
-
-    private void openPublicAccountHelper() {
-        handler.postDelayed(() -> {
-            try {
-                Intent intent = getPackageManager().getLaunchIntentForPackage("com.example.publicaccounthelper");
-                if (intent == null) {
-                    intent = getPackageManager().getLaunchIntentForPackage("com.tencent.mm");
-                }
-                if (intent != null) {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            handler.postDelayed(() -> {
-                currentStep = 1;
-                processCurrentStep();
-            }, 3000);
-        }, 500);
+        currentStep = 1;
+        processCurrentStep();
     }
 
     private void processCurrentStep() {
@@ -100,27 +79,30 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             try {
                 switch (currentStep) {
                     case 1:
-                        clickText("贴图");
+                        openPublicAccountHelper();
                         break;
                     case 2:
-                        selectFirstImage();
+                        clickText("贴图");
                         break;
                     case 3:
-                        clickText("下一步");
+                        selectFirstImage();
                         break;
                     case 4:
-                        clickText("完成");
+                        clickText("下一步");
                         break;
                     case 5:
-                        fillTitle();
+                        clickText("完成");
                         break;
                     case 6:
-                        clickText("更多设置");
+                        fillTitle();
                         break;
                     case 7:
-                        toggleGroupNotification();
+                        clickText("更多设置");
                         break;
                     case 8:
+                        toggleGroupNotification();
+                        break;
+                    case 9:
                         clickText("发布");
                         break;
                     default:
@@ -133,8 +115,25 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         }, 1000);
     }
 
+    private void openPublicAccountHelper() {
+        try {
+            Intent intent = getPackageManager().getLaunchIntentForPackage("com.tencent.mp");
+            if (intent == null) {
+                intent = getPackageManager().getLaunchIntentForPackage("com.tencent.mm");
+            }
+            if (intent != null) {
+                currentStep++;
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        handler.postDelayed(() -> processCurrentStep(), 3000);
+    }
+
     private void clickText(String text) {
-        
+
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         if (rootNode == null)
             return;

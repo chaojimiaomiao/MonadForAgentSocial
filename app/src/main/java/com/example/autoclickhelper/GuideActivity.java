@@ -148,30 +148,43 @@ public class GuideActivity extends AppCompatActivity {
     private void openBatterySettings() {
         prefs.edit().putBoolean("battery_enabled", true).apply();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-            startActivity(intent);
+        String manufacturer = Build.MANUFACTURER.toLowerCase();
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (manufacturer.contains("xiaomi")) {
+            intent.setComponent(new android.content.ComponentName("com.miui.securitycenter",
+                    "com.miui.permcenter.autostart.AutoStartManagementActivity"));
+        } else if (manufacturer.contains("samsung")) {
+            intent.setComponent(new android.content.ComponentName("com.samsung.android.sm",
+                    "com.samsung.android.sm.app.dashboard.SmartManagerDashBoardActivity"));
+        } else if (manufacturer.contains("huawei")) {
+            intent.setComponent(new android.content.ComponentName("com.huawei.systemmanager",
+                    "com.huawei.systemmanager.optimize.process.ProtectActivity"));
+        } else if (manufacturer.contains("oppo")) {
+            intent.setComponent(new android.content.ComponentName("com.coloros.safecenter",
+                    "com.coloros.safecenter.permission.floatwindow.FloatWindowListActivity"));
+        } else if (manufacturer.contains("vivo")) {
+            intent.setComponent(new android.content.ComponentName("com.vivo.permissionmanager",
+                    "com.vivo.permissionmanager.activity.PurviewTabActivity"));
+        } else if (manufacturer.contains("meizu")) {
+            intent.setComponent(new android.content.ComponentName("com.meizu.safe",
+                    "com.meizu.safe.permission.SmartBGActivity"));
+        } else if (manufacturer.contains("oneplus")) {
+            intent.setComponent(new android.content.ComponentName("com.oneplus.security",
+                    "com.oneplus.security.chainlaunch.view.ChainLaunchAppListActivity"));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
         } else {
-            String manufacturer = Build.MANUFACTURER.toLowerCase();
-            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_BATTERY_SAVER_SETTINGS);
+        }
 
-            if (manufacturer.contains("xiaomi")) {
-                intent.setComponent(new android.content.ComponentName("com.miui.securitycenter",
-                        "com.miui.powermanager.PowerSettings"));
-            } else if (manufacturer.contains("huawei")) {
-                intent.setComponent(new android.content.ComponentName("com.huawei.systemmanager",
-                        "com.huawei.systemmanager.power.PowerManagerActivity"));
-            } else {
-                intent.setAction(Settings.ACTION_BATTERY_SAVER_SETTINGS);
-            }
-
-            try {
-                startActivity(intent);
-            } catch (Exception e) {
-                Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                fallback.setData(Uri.fromParts("package", getPackageName(), null));
-                startActivity(fallback);
-            }
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            fallback.setData(Uri.fromParts("package", getPackageName(), null));
+            startActivity(fallback);
         }
     }
 
