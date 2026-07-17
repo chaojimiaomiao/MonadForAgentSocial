@@ -2,7 +2,6 @@ package com.example.autoclickhelper;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -25,8 +24,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     private static boolean isRunning = false;
     private static boolean isExecuting = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private int currentStep = 0;
-    private int screenHeight;
+    private int screenHeight, screenWidth;
 
     @Override
     public void onCreate() {
@@ -34,6 +32,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         instance = this;
         isRunning = true;
         screenHeight = getResources().getDisplayMetrics().heightPixels;
+        screenWidth = getResources().getDisplayMetrics().widthPixels;
     }
 
     @Override
@@ -51,7 +50,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
         int eventType = event.getEventType();
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            processCurrentStep();
+            //Toast.makeText(this, "onAccessibilityEvent: ", Toast.LENGTH_SHORT).show();
+            //processCurrentStep();
         }
     }
 
@@ -70,75 +70,31 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private void startAutoPostTask() {
+        Toast.makeText(this, "startAutoPostTask: ", Toast.LENGTH_SHORT).show();
         if (isExecuting)
             return;
         isExecuting = true;
-        currentStep = 1;
-        processCurrentStep();
+        openPublicAccountHelper();
     }
 
-    private void processCurrentStep() {
-        handler.postDelayed(() -> {
-            try {
-                switch (currentStep) {
-                    case 1:
-                        openPublicAccountHelper();
-                        break;
-                    case 2:
-                        clickText("贴图");
-                        break;
-                    case 3:
-                        clickSecondImage();
-                        break;
-                    case 4:
-                        selectFirstImage();
-                        break;
-                    case 5:
-                        clickText("下一步");
-                        break;
-                    case 6:
-                        clickText("完成");
-                        break;
-                    case 7:
-                        fillTitle();
-                        break;
-                    case 8:
-                        clickText("更多设置");
-                        break;
-                    case 9:
-                        toggleGroupNotification();
-                        break;
-                    case 10:
-                        clickText("发布");
-                        break;
-                    default:
-                        isExecuting = false;
-                        break;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 1000);
-    }
-
-    private void openPublicAccountHelper() {
+    private void openPublicAccountHelper() {//step1
         try {
             Intent intent = getPackageManager().getLaunchIntentForPackage("com.tencent.mp");
             if (intent == null) {
                 intent = getPackageManager().getLaunchIntentForPackage("com.tencent.mm");
             }
             if (intent != null) {
-                currentStep++;
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        handler.postDelayed(() -> processCurrentStep(), 3000);
+        handler.postDelayed(() -> clickText("贴图"), 3000);
     }
 
-    private void clickText(String text) {
+    private void clickText(String text) {//step 2,5,6,8,10
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         if (rootNode == null)
             return;
@@ -154,37 +110,67 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                     performClick(parent);
                 }
             }
-            currentStep++;
         }
         rootNode.recycle();
+
+        handler.postDelayed(() -> {
+            Toast.makeText(this, "switch: " + text, Toast.LENGTH_SHORT).show();
+            switch (text) {
+                case "贴图":
+                    clickSecondImage();
+                    break;
+                case "下一步":
+                    //clickText("完成");
+                    clickYouXia();
+                    break;
+                /*case "完成":
+                    fillTitle();
+                    break;*/
+                case "更多设置":
+                    toggleGroupNotification();
+                    break;
+                case "发布":
+                    //currentStep = 11;
+                    Toast.makeText(this, "完毕。", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        },5000);
+    }
+
+    private void clickYouXia() {
+        Toast.makeText(this, "右下角", Toast.LENGTH_SHORT).show();
+        //clickAt(screenWidth * 0.9f, screenHeight * 0.9f);
+        clickAt(950, 2250);
+        handler.postDelayed(() -> {
+            fillTitle();
+        }, 3000);
     }
 
     private void clickSecondImage() {
+        Toast.makeText(this, "选中图片", Toast.LENGTH_SHORT).show();
 //        GestureDescription.Builder builder = new GestureDescription.Builder();
 //        Path path = new android.graphics.Path();
 //        path.moveTo(20, 200);
 //        builder.addStroke(new GestureDescription.StrokeDescription(path, 0, 100));
 //        dispatchGesture(builder.build(), null, null);
         clickAt(50, 800);
-        currentStep++;
+        //currentStep = 4;
+        handler.postDelayed(() -> {
+            checkDotImage();
+        }, 3000);
     }
 
-    private void selectFirstImage() {
+    private void checkDotImage() {
+        Toast.makeText(this, "checkDotImage", Toast.LENGTH_SHORT).show();
+        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
+        if (rootNode == null)
+            return;
+
+        clickAlbumImageCheckbox(rootNode);
+        rootNode.recycle();
         handler.postDelayed(() -> {
-            currentStep++;
-            AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-            if (rootNode == null)
-                return;
-
-            clickAlbumImageCheckbox(rootNode);
-
-            rootNode.recycle();
-
-//            handler.postDelayed(() -> {
-//                currentStep++;
-//                processCurrentStep();
-//            }, 1500);
-        }, 2500);
+            clickText("下一步");
+        }, 5000);
     }
 
     private void clickAlbumImageCheckbox(AccessibilityNodeInfo root) {
@@ -221,7 +207,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             if (node.isClickable()) {
                 Rect bounds = new Rect();
                 node.getBoundsInScreen(bounds);
-                int screenWidth = getResources().getDisplayMetrics().widthPixels;
                 if (bounds.right > screenWidth * 0.8 && bounds.top < screenHeight * 0.3) {
                     performClick(node);
                     node.recycle();
@@ -243,11 +228,14 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private void fillTitle() {
+        Toast.makeText(this, "填写标题", Toast.LENGTH_SHORT).show();
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        if (rootNode == null)
+        if (rootNode == null) {
+            Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
             return;
+        }
 
-        String title = "梦核科技AI日报|" + getCurrentDate();
+        String title = "梦核科技AI日报| 今日";// + getCurrentDate();
 
         List<AccessibilityNodeInfo> editTexts = rootNode.findAccessibilityNodeInfosByViewId("android:id/edit");
         if (editTexts.isEmpty()) {
@@ -258,40 +246,60 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         }
 
         if (!editTexts.isEmpty()) {
+            Toast.makeText(this, "不为空", Toast.LENGTH_SHORT).show();
             AccessibilityNodeInfo editText = editTexts.get(0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Bundle arguments = new Bundle();
                 arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, title);
                 editText.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+            } else {
+                editText.setText(title);
             }
         }
-        currentStep++;
         rootNode.recycle();
-        handler.postDelayed(() -> processCurrentStep(), 1000);
+        handler.postDelayed(() -> clickText("更多设置"), 5000);
     }
 
     private void toggleGroupNotification() {
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        if (rootNode == null)
-            return;
+        clickAt(930, 450);
+        handler.postDelayed(() -> {
+            clickAt(50, 200);
+            Toast.makeText(this, "返回", Toast.LENGTH_SHORT).show();
+            //clickText("返回");
+        }, 3000);
+    }
 
-        List<AccessibilityNodeInfo> toggleNodes = rootNode
-                .findAccessibilityNodeInfosByViewId("android:id/switch_widget");
-        if (!toggleNodes.isEmpty()) {
-            for (AccessibilityNodeInfo toggle : toggleNodes) {
-                if (toggle.isChecked()) {
-                    performClick(toggle);
-                    break;
-                }
-            }
+    private void toggleGroupNotification1() {
+        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
+        if (rootNode == null) {
+            Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        currentStep++;
+        // 方式1: 查找"群发通知"文字，然后点击它右边的区域
+        List<AccessibilityNodeInfo> textNodes = rootNode.findAccessibilityNodeInfosByText("群发通知");
+        if (!textNodes.isEmpty()) {
+            AccessibilityNodeInfo textNode = textNodes.get(0);
+            Rect textBounds = new Rect();
+            textNode.getBoundsInScreen(textBounds);
+
+            // 点击文字右侧（toggle位置）
+            int toggleX = textBounds.right + 100;
+            int toggleY = textBounds.centerY();
+            clickAt(toggleX, toggleY);
+        }
+
+        // 方式2: 直接点击屏幕右侧位置（兜底）
+        else {
+            //clickAt(screenWidth * 0.85f, screenHeight * 0.15f);
+            clickAt(930, 450);
+        }
+
         rootNode.recycle();
 
         handler.postDelayed(() -> {
-            clickText("返回");
-        }, 1000);
+            clickAt(50, 200);  // 返回
+        }, 3500);
     }
 
     private String getCurrentDate() {
