@@ -2,6 +2,7 @@ package com.example.autoclickhelper;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -71,8 +73,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
     private void startAutoPostTask() {
         Toast.makeText(this, "startAutoPostTask: ", Toast.LENGTH_SHORT).show();
-        if (isExecuting)
-            return;
+        /*if (isExecuting)
+            return;*/
         isExecuting = true;
         openPublicAccountHelper();
     }
@@ -240,7 +242,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 return;
             }
 
-            String title = "梦核科技AI日报|" + getCurrentDate();
+            String title = "梦核科技AI日报 | " + getCurrentDate();
 
             // 步骤2: 查找当前聚焦的输入框
             List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
@@ -257,23 +259,25 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                         node.setText(title);
                     }
                     Toast.makeText(this, "标题填写成功", Toast.LENGTH_SHORT).show();
+                    //
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+
                     node.recycle();
                     break;
                 }
             }
 
             rootNode.recycle();
+            // 找到编辑框后，清除焦点
+            //editText.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+            Toast.makeText(this, "收起键盘", Toast.LENGTH_SHORT).show();
 
-            // 步骤3: 延迟后收起键盘
-            handler.postDelayed(() -> {
-                // 点击屏幕顶部空白区域收起键盘
-                clickAt(screenWidth / 2f, 100f);
-                Toast.makeText(this, "收起键盘", Toast.LENGTH_SHORT).show();
+            // 步骤4: 延迟后点击"更多设置"
+            handler.postDelayed(() -> clickText("更多设置"), 3000);
 
-                // 步骤4: 延迟后点击"更多设置"
-                handler.postDelayed(() -> clickText("更多设置"), 1000);
-            }, 500);
-        }, 1000);
+        }, 3000);
     }
 
     private void fillTitle1() {
@@ -352,7 +356,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private String getCurrentDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMdd", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("MM月dd日", Locale.getDefault());
         return sdf.format(new Date());
     }
 
