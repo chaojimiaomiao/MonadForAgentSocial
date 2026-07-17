@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">自动点击助手</string>
+    <string name="accessibility_description">自动点击助手需要无障碍权限来执行自动点击操作</string>
+    <string name="guide_title">欢迎使用自动点击助手</string>
+    <string name="guide_desc">请开启必要的权限以使用全部功能</string>
+    <string name="permission_accessibility">无障碍权限</string>
+    <string name="permission_autostart">开机自启动</string>
+    <string name="permission_battery">省电策略</string>
+    <string name="btn_open_settings">前往设置</string>
+    <string name="btn_skip">跳过</string>
+    <string name="btn_done">完成</string>
+    <string name="main_title">自动点击助手</string>
+    <string name="task_title">自动发布贴图号</string>
+    <string name="task_desc">每天定时自动发布公众号贴图</string>
+    <string name="btn_start_task">立即执行</string>
+    <string name="btn_start_service">启动服务</string>
+    <string name="btn_stop_service">停止服务</string>
+    <string name="status_running">服务运行中</string>
+    <string name="status_stopped">服务已停止</string>
+    <string name="time_picker_title">设置执行时间</string>
+    <string name="notification_title">自动点击助手</string>
+    <string name="notification_desc">服务运行中</string>
+</resources>

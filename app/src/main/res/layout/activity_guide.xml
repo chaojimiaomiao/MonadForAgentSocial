@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/guide_title"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/guide_desc"
+        android:textSize="14sp"
+        android:textColor="@color/grey_600"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:padding="16dp"
+        android:layout_marginBottom="12dp">
+
+        <View
+            android:id="@+id/accessibility_status"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/dot_pending" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/permission_accessibility"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="12dp" />
+
+        <Button
+            android:id="@+id/btn_accessibility"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/btn_open_settings"
+            android:textSize="12sp"
+            android:minWidth="0dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:padding="16dp"
+        android:layout_marginBottom="12dp">
+
+        <View
+            android:id="@+id/autostart_status"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/dot_pending" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/permission_autostart"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="12dp" />
+
+        <Button
+            android:id="@+id/btn_autostart"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/btn_open_settings"
+            android:textSize="12sp"
+            android:minWidth="0dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:padding="16dp"
+        android:layout_marginBottom="24dp">
+
+        <View
+            android:id="@+id/battery_status"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/dot_pending" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/permission_battery"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="12dp" />
+
+        <Button
+            android:id="@+id/btn_battery"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/btn_open_settings"
+            android:textSize="12sp"
+            android:minWidth="0dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_skip"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="@string/btn_skip"
+            android:textColor="@color/grey_600"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <Button
+            android:id="@+id/btn_done"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="2"
+            android:text="@string/btn_done"
+            android:backgroundTint="@color/teal_500"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</LinearLayout>
