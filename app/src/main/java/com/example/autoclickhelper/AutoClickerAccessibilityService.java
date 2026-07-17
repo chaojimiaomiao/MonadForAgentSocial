@@ -25,12 +25,14 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     private static boolean isExecuting = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private int currentStep = 0;
+    private int screenHeight;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
         isRunning = true;
+        screenHeight = getResources().getDisplayMetrics().heightPixels;
     }
 
     @Override
@@ -161,64 +163,73 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             if (rootNode == null)
                 return;
 
-            AccessibilityNodeInfo targetNode = findAlbumFirstImage(rootNode);
-
-            if (targetNode != null) {
-                performClick(targetNode);
-                targetNode.recycle();
-            }
+            clickAlbumImageCheckbox(rootNode);
 
             rootNode.recycle();
 
             handler.postDelayed(() -> {
                 currentStep++;
                 processCurrentStep();
-            }, 2000);
+            }, 1500);
         }, 1500);
     }
 
-    private AccessibilityNodeInfo findAlbumFirstImage(AccessibilityNodeInfo root) {
+    private void clickAlbumImageCheckbox(AccessibilityNodeInfo root) {
         List<AccessibilityNodeInfo> checkboxes = root.findAccessibilityNodeInfosByViewId("android:id/checkbox");
         if (!checkboxes.isEmpty()) {
-            if (checkboxes.size() > 3) {
-                return checkboxes.get(3);
-            } else if (!checkboxes.isEmpty()) {
-                return checkboxes.get(0);
+            int targetIndex = checkboxes.size() > 3 ? 3 : 0;
+            AccessibilityNodeInfo checkbox = checkboxes.get(targetIndex);
+            performClick(checkbox);
+            checkbox.recycle();
+            return;
+        }
+
+        List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
+        collectAllNodes(root, allNodes);
+
+        for (AccessibilityNodeInfo node : allNodes) {
+            String className = node.getClassName().toString();
+            if ((className.contains("CheckBox") || className.contains("check")) && node.isClickable()) {
+                performClick(node);
+                node.recycle();
+                return;
             }
         }
 
-        List<AccessibilityNodeInfo> allClickableImages = new java.util.ArrayList<>();
-        collectClickableImages(root, allClickableImages);
-
-        if (allClickableImages.size() > 3) {
-            return allClickableImages.get(3);
-        } else if (!allClickableImages.isEmpty()) {
-            return allClickableImages.get(0);
+        for (AccessibilityNodeInfo node : allNodes) {
+            if (node.isClickable() && node.getContentDescription() != null) {
+                String desc = node.getContentDescription().toString();
+                if (desc.contains("选择") || desc.contains("check")) {
+                    performClick(node);
+                    node.recycle();
+                    return;
+                }
+            }
         }
 
-        List<AccessibilityNodeInfo> images = root.findAccessibilityNodeInfosByViewId("android:id/icon");
-        if (images.size() > 3) {
-            return images.get(3);
-        } else if (!images.isEmpty()) {
-            return images.get(0);
+        for (AccessibilityNodeInfo node : allNodes) {
+            if (node.isClickable()) {
+                Rect bounds = new Rect();
+                node.getBoundsInScreen(bounds);
+                int screenWidth = getResources().getDisplayMetrics().widthPixels;
+                if (bounds.right > screenWidth * 0.8 && bounds.top < screenHeight * 0.3) {
+                    performClick(node);
+                    node.recycle();
+                    return;
+                }
+            }
         }
-
-        return null;
     }
 
-    private void collectClickableImages(AccessibilityNodeInfo root, List<AccessibilityNodeInfo> result) {
+    private void collectAllNodes(AccessibilityNodeInfo root, List<AccessibilityNodeInfo> result) {
         if (root == null)
             return;
 
-        String className = root.getClassName().toString();
-        if ((className.contains("ImageView") || className.contains("Image")) && root.isClickable()) {
-            result.add(root);
-            return;
-        }
+        result.add(root);
 
         for (int i = 0; i < root.getChildCount(); i++) {
             AccessibilityNodeInfo child = root.getChild(i);
-            collectClickableImages(child, result);
+            collectAllNodes(child, result);
         }
     }
 
