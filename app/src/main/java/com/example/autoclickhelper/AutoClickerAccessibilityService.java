@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -87,24 +88,27 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                         clickText("贴图");
                         break;
                     case 3:
-                        selectFirstImage();
+                        clickSecondImage();
                         break;
                     case 4:
-                        clickText("下一步");
+                        selectFirstImage();
                         break;
                     case 5:
-                        clickText("完成");
+                        clickText("下一步");
                         break;
                     case 6:
-                        fillTitle();
+                        clickText("完成");
                         break;
                     case 7:
-                        clickText("更多设置");
+                        fillTitle();
                         break;
                     case 8:
-                        toggleGroupNotification();
+                        clickText("更多设置");
                         break;
                     case 9:
+                        toggleGroupNotification();
+                        break;
+                    case 10:
                         clickText("发布");
                         break;
                     default:
@@ -135,7 +139,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private void clickText(String text) {
-
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         if (rootNode == null)
             return;
@@ -153,12 +156,22 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             }
             currentStep++;
         }
-
         rootNode.recycle();
+    }
+
+    private void clickSecondImage() {
+//        GestureDescription.Builder builder = new GestureDescription.Builder();
+//        Path path = new android.graphics.Path();
+//        path.moveTo(20, 200);
+//        builder.addStroke(new GestureDescription.StrokeDescription(path, 0, 100));
+//        dispatchGesture(builder.build(), null, null);
+        clickAt(50, 800);
+        currentStep++;
     }
 
     private void selectFirstImage() {
         handler.postDelayed(() -> {
+            currentStep++;
             AccessibilityNodeInfo rootNode = getRootInActiveWindow();
             if (rootNode == null)
                 return;
@@ -167,14 +180,15 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
             rootNode.recycle();
 
-            handler.postDelayed(() -> {
-                currentStep++;
-                processCurrentStep();
-            }, 1500);
-        }, 1500);
+//            handler.postDelayed(() -> {
+//                currentStep++;
+//                processCurrentStep();
+//            }, 1500);
+        }, 2500);
     }
 
     private void clickAlbumImageCheckbox(AccessibilityNodeInfo root) {
+        Toast.makeText(this, "点击圆点", Toast.LENGTH_SHORT).show();
         List<AccessibilityNodeInfo> checkboxes = root.findAccessibilityNodeInfosByViewId("android:id/checkbox");
         if (!checkboxes.isEmpty()) {
             int targetIndex = checkboxes.size() > 3 ? 3 : 0;
@@ -183,10 +197,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             checkbox.recycle();
             return;
         }
-
         List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
         collectAllNodes(root, allNodes);
-
         for (AccessibilityNodeInfo node : allNodes) {
             String className = node.getClassName().toString();
             if ((className.contains("CheckBox") || className.contains("check")) && node.isClickable()) {
@@ -195,7 +207,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 return;
             }
         }
-
         for (AccessibilityNodeInfo node : allNodes) {
             if (node.isClickable() && node.getContentDescription() != null) {
                 String desc = node.getContentDescription().toString();
@@ -206,7 +217,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 }
             }
         }
-
         for (AccessibilityNodeInfo node : allNodes) {
             if (node.isClickable()) {
                 Rect bounds = new Rect();
@@ -226,7 +236,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             return;
 
         result.add(root);
-
         for (int i = 0; i < root.getChildCount(); i++) {
             AccessibilityNodeInfo child = root.getChild(i);
             collectAllNodes(child, result);
@@ -256,10 +265,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 editText.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
             }
         }
-
         currentStep++;
         rootNode.recycle();
-
         handler.postDelayed(() -> processCurrentStep(), 1000);
     }
 
@@ -318,5 +325,26 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
     private List<AccessibilityNodeInfo> findEditableNodes(AccessibilityNodeInfo root) {
         return root.findAccessibilityNodeInfosByText("填写标题");
+    }
+
+    public void clickAt(float x, float y) {
+        Path path = new Path();
+        path.moveTo(x, y);
+
+        GestureDescription gesture = new GestureDescription.Builder()
+                .addStroke(new GestureDescription.StrokeDescription(path, 0, 100))
+                .build();
+
+        dispatchGesture(gesture, new AccessibilityService.GestureResultCallback() {
+            @Override
+            public void onCompleted(GestureDescription gestureDescription) {
+                // 点击完成
+            }
+
+            @Override
+            public void onCancelled(GestureDescription gestureDescription) {
+                // 被打断（来电、弹窗等）
+            }
+        }, null);
     }
 }
