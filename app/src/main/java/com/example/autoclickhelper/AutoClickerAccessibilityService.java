@@ -134,7 +134,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                     Toast.makeText(this, "完毕。", Toast.LENGTH_SHORT).show();
                     break;
             }
-        },5000);
+        },4000);
     }
 
     private void clickYouXia() {
@@ -170,7 +170,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         rootNode.recycle();
         handler.postDelayed(() -> {
             clickText("下一步");
-        }, 5000);
+        }, 4000);
     }
 
     private void clickAlbumImageCheckbox(AccessibilityNodeInfo root) {
@@ -229,6 +229,55 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
     private void fillTitle() {
         Toast.makeText(this, "填写标题", Toast.LENGTH_SHORT).show();
+
+        // 步骤1: 点击"填写标题"输入框位置激活它
+        clickAt(220f, 970f);  // 输入框大约在屏幕上方45%位置
+
+        handler.postDelayed(() -> {
+            AccessibilityNodeInfo rootNode = getRootInActiveWindow();
+            if (rootNode == null) {
+                Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String title = "梦核科技AI日报|" + getCurrentDate();
+
+            // 步骤2: 查找当前聚焦的输入框
+            List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
+            collectAllNodes(rootNode, allNodes);
+
+            for (AccessibilityNodeInfo node : allNodes) {
+                // 查找可编辑且已聚焦的节点
+                if (node.isEditable() && node.isFocused()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Bundle arguments = new Bundle();
+                        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, title);
+                        node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+                    } else {
+                        node.setText(title);
+                    }
+                    Toast.makeText(this, "标题填写成功", Toast.LENGTH_SHORT).show();
+                    node.recycle();
+                    break;
+                }
+            }
+
+            rootNode.recycle();
+
+            // 步骤3: 延迟后收起键盘
+            handler.postDelayed(() -> {
+                // 点击屏幕顶部空白区域收起键盘
+                clickAt(screenWidth / 2f, 100f);
+                Toast.makeText(this, "收起键盘", Toast.LENGTH_SHORT).show();
+
+                // 步骤4: 延迟后点击"更多设置"
+                handler.postDelayed(() -> clickText("更多设置"), 1000);
+            }, 500);
+        }, 1000);
+    }
+
+    private void fillTitle1() {
+        Toast.makeText(this, "填写标题", Toast.LENGTH_SHORT).show();
         AccessibilityNodeInfo rootNode = getRootInActiveWindow();
         if (rootNode == null) {
             Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
@@ -257,7 +306,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             }
         }
         rootNode.recycle();
-        handler.postDelayed(() -> clickText("更多设置"), 5000);
+        handler.postDelayed(() -> clickText("更多设置"), 3000);
     }
 
     private void toggleGroupNotification() {
@@ -265,8 +314,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         handler.postDelayed(() -> {
             clickAt(50, 200);
             Toast.makeText(this, "返回", Toast.LENGTH_SHORT).show();
-            //clickText("返回");
-        }, 3000);
+            clickText("发布");
+        }, 4000);
     }
 
     private void toggleGroupNotification1() {
