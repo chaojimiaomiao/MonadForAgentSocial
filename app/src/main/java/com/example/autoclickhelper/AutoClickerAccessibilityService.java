@@ -156,38 +156,73 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private void selectFirstImage() {
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        if (rootNode == null)
-            return;
+        handler.postDelayed(() -> {
+            AccessibilityNodeInfo rootNode = getRootInActiveWindow();
+            if (rootNode == null)
+                return;
 
-        List<AccessibilityNodeInfo> imageNodes = rootNode.findAccessibilityNodeInfosByViewId("android:id/icon");
-        if (!imageNodes.isEmpty()) {
-            AccessibilityNodeInfo firstImage = imageNodes.get(0);
-            if (firstImage.isClickable()) {
-                performClick(firstImage);
+            AccessibilityNodeInfo targetNode = findFirstClickableImage(rootNode);
+
+            if (targetNode != null) {
+                performClick(targetNode);
+                targetNode.recycle();
             } else {
-                AccessibilityNodeInfo parent = findClickableParent(firstImage);
-                if (parent != null) {
-                    performClick(parent);
-                }
+                clickFirstVisibleItem(rootNode);
             }
-        } else {
-            List<AccessibilityNodeInfo> allNodes = rootNode.findAccessibilityNodeInfosByText("");
-            for (AccessibilityNodeInfo node : allNodes) {
-                if (node.getClassName().toString().contains("ImageView") && node.isClickable()) {
-                    performClick(node);
-                    break;
-                }
-            }
+
+            rootNode.recycle();
+
+            handler.postDelayed(() -> {
+                currentStep++;
+                processCurrentStep();
+            }, 2000);
+        }, 1500);
+    }
+
+    private AccessibilityNodeInfo findFirstClickableImage(AccessibilityNodeInfo root) {
+        if (root == null)
+            return null;
+
+        String className = root.getClassName().toString();
+        if ((className.contains("ImageView") || className.contains("Image")) && root.isClickable()) {
+            return root;
         }
 
-        currentStep++;
-        rootNode.recycle();
+        for (int i = 0; i < root.getChildCount(); i++) {
+            AccessibilityNodeInfo child = root.getChild(i);
+            AccessibilityNodeInfo result = findFirstClickableImage(child);
+            if (result != null) {
+                return result;
+            }
+            child.recycle();
+        }
 
-        handler.postDelayed(() -> {
-            currentStep++;
-            processCurrentStep();
-        }, 2000);
+        return null;
+    }
+
+    private void clickFirstVisibleItem(AccessibilityNodeInfo root) {
+        List<AccessibilityNodeInfo> listItems = root.findAccessibilityNodeInfosByViewId("android:id/text1");
+        if (!listItems.isEmpty()) {
+            AccessibilityNodeInfo item = listItems.get(0);
+            AccessibilityNodeInfo parent = findClickableParent(item);
+            if (parent != null) {
+                performClick(parent);
+                parent.recycle();
+            }
+            item.recycle();
+            return;
+        }
+
+        List<AccessibilityNodeInfo> gridItems = root.findAccessibilityNodeInfosByViewId("android:id/icon");
+        if (!gridItems.isEmpty()) {
+            AccessibilityNodeInfo item = gridItems.get(0);
+            AccessibilityNodeInfo parent = findClickableParent(item);
+            if (parent != null) {
+                performClick(parent);
+                parent.recycle();
+            }
+            item.recycle();
+        }
     }
 
     private void fillTitle() {
