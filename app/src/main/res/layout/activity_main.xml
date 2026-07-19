@@ -105,10 +105,21 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
             <Button
+                android:id="@+id/btn_generate_download"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginLeft="6dp"
+                android:text="生成下载"
+                android:textSize="14sp"
+                android:textColor="@color/teal_500"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+            <Button
                 android:id="@+id/btn_execute_task"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:text="@string/btn_start_task"
                 android:textSize="14sp"
                 android:backgroundTint="@color/teal_500"

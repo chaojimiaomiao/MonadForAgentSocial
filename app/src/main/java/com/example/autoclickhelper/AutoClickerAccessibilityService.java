@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.os.Build;
@@ -68,6 +69,18 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     public static void executeAutoPostTask() {
         if (instance == null)
             return;
+
+        /*new AiDailyService().generateAndDownload(instance, new
+                AiDailyService.OnCompleteListener() {
+                    @Override
+                    public void onSuccess(String savedPath, Bitmap bitmap) {
+                        Toast.makeText(instance, "日报已保存: " + savedPath, Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(instance, "失败: " + error, Toast.LENGTH_LONG).show();
+                    }
+        });*/
         instance.startAutoPostTask();
     }
 
@@ -282,7 +295,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private void makeSurePopup() {
-        clickText("发表");
+        clickAt(880, 1420);
     }
 
     private void toggleGroupNotification() {

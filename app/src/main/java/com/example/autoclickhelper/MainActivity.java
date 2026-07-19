@@ -7,9 +7,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
+    private AiDailyService aiDailyService;
     private TextView serviceStatus;
     private View serviceStatusDot;
     private Button btnToggleService;
@@ -51,12 +55,38 @@ public class MainActivity extends AppCompatActivity {
         btnExecuteTask.setOnClickListener(v -> executeTask());
         btnSetTime.setOnClickListener(v -> showTimePicker());
         btnSettings.setOnClickListener(v -> openSettings());
+
+        aiDailyService = new AiDailyService();
+        generateDownloadPic();
+    }
+
+    private void generateDownloadPic() {
+        findViewById(R.id.btn_generate_download).setOnClickListener(v -> {
+            aiDailyService.generateAndDownload(this, new
+                    AiDailyService.OnCompleteListener() {
+                        @Override
+                        public void onSuccess(String savedPath, Bitmap bitmap) {
+                            Toast.makeText(MainActivity.this, "日报已保存: " + savedPath, Toast.LENGTH_LONG).show();
+                        }
+                        @Override
+                        public void onError(String error) {
+                            Toast.makeText(MainActivity.this, "失败: " + error, Toast.LENGTH_LONG).show();
+                        }
+                    });
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         updateServiceStatus();
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        if (aiDailyService != null) {
+            aiDailyService.shutdown();
+        }
     }
 
     private void updateServiceStatus() {
@@ -77,7 +107,9 @@ public class MainActivity extends AppCompatActivity {
             stopService(new Intent(this, AutoClickerService.class));
             cancelAlarm();
         } else {
-            startForegroundService(new Intent(this, AutoClickerService.class));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(new Intent(this, AutoClickerService.class));
+            }
             scheduleAlarm();
         }
         updateServiceStatus();
