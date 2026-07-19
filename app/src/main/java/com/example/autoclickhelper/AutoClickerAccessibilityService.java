@@ -122,16 +122,12 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                     clickSecondImage();
                     break;
                 case "下一步":
-                    //clickText("完成");
                     clickYouXia();
                     break;
-                /*case "完成":
-                    fillTitle();
-                    break;*/
                 case "更多设置":
                     toggleGroupNotification();
                     break;
-                case "发布":
+                case "发表":
                     //currentStep = 11;
                     Toast.makeText(this, "完毕。", Toast.LENGTH_SHORT).show();
                     break;
@@ -144,8 +140,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         //clickAt(screenWidth * 0.9f, screenHeight * 0.9f);
         clickAt(950, 2250);
         handler.postDelayed(() -> {
-            fillTitle();
-        }, 3000);
+            clickText("更多设置");
+        }, 4000);
     }
 
     private void clickSecondImage() {
@@ -229,7 +225,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         }
     }
 
-    private void fillTitle() {
+    private void S9fillTitle() {
         Toast.makeText(this, "填写标题", Toast.LENGTH_SHORT).show();
 
         // 步骤1: 点击"填写标题"输入框位置激活它
@@ -274,52 +270,32 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
             Toast.makeText(this, "收起键盘", Toast.LENGTH_SHORT).show();
 
-            // 步骤4: 延迟后点击"更多设置"
-            handler.postDelayed(() -> clickText("更多设置"), 3000);
+            // 步骤4: 直接点击右上角发表
+            handler.postDelayed(() -> clickYoushangFabiao(), 3000);
 
         }, 3000);
     }
 
-    private void fillTitle1() {
-        Toast.makeText(this, "填写标题", Toast.LENGTH_SHORT).show();
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        if (rootNode == null) {
-            Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void clickYoushangFabiao() {
+        clickText("发表");
+        handler.postDelayed(() -> makeSurePopup(), 4000);
+    }
 
-        String title = "梦核科技AI日报| 今日";// + getCurrentDate();
-
-        List<AccessibilityNodeInfo> editTexts = rootNode.findAccessibilityNodeInfosByViewId("android:id/edit");
-        if (editTexts.isEmpty()) {
-            editTexts = rootNode.findAccessibilityNodeInfosByViewId("com.example.publicaccounthelper:id/title");
-        }
-        if (editTexts.isEmpty()) {
-            editTexts = findEditableNodes(rootNode);
-        }
-
-        if (!editTexts.isEmpty()) {
-            Toast.makeText(this, "不为空", Toast.LENGTH_SHORT).show();
-            AccessibilityNodeInfo editText = editTexts.get(0);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Bundle arguments = new Bundle();
-                arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, title);
-                editText.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
-            } else {
-                editText.setText(title);
-            }
-        }
-        rootNode.recycle();
-        handler.postDelayed(() -> clickText("更多设置"), 3000);
+    private void makeSurePopup() {
+        clickText("发表");
     }
 
     private void toggleGroupNotification() {
         clickAt(930, 450);
         handler.postDelayed(() -> {
-            clickAt(50, 200);
-            Toast.makeText(this, "返回", Toast.LENGTH_SHORT).show();
-            clickText("发布");
+            clickBack();
         }, 4000);
+    }
+
+    private void clickBack() {
+        Toast.makeText(this, "返回", Toast.LENGTH_SHORT).show();
+        clickAt(88, 220);
+        handler.postDelayed(() -> S9fillTitle(), 4000);
     }
 
     private void toggleGroupNotification1() {
