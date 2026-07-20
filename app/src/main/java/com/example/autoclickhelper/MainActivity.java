@@ -66,11 +66,11 @@ public class MainActivity extends AppCompatActivity {
                     AiDailyService.OnCompleteListener() {
                         @Override
                         public void onSuccess(String savedPath, Bitmap bitmap) {
-                            Toast.makeText(MainActivity.this, "日报已保存: " + savedPath, Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, "日报已保存: " + savedPath, Toast.LENGTH_SHORT).show();
                         }
                         @Override
                         public void onError(String error) {
-                            Toast.makeText(MainActivity.this, "失败: " + error, Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, "失败: " + error, Toast.LENGTH_SHORT).show();
                         }
                     });
         });
@@ -166,15 +166,17 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AutoClickerService.class);
         intent.putExtra("action", "execute_task");
+        intent.putExtra("source", "alarm");  // 新增：标记来源是定时任务
 
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         } else {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        }
+        }*/
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     private void cancelAlarm() {

@@ -6,9 +6,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -33,7 +35,23 @@ public class AutoClickerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && "execute_task".equals(intent.getStringExtra("action"))) {
-            executeAutoClickTask();
+            String source = intent.getStringExtra("source");
+            if ("alarm".equals(source)) {
+                new AiDailyService().generateAndDownload(this, new
+                        AiDailyService.OnCompleteListener() {
+                            @Override
+                            public void onSuccess(String savedPath, Bitmap bitmap) {
+                                Toast.makeText(AutoClickerService.this, "日报已保存: " + savedPath, Toast.LENGTH_SHORT).show();
+                                executeAutoClickTask();
+                            }
+                            @Override
+                            public void onError(String error) {
+                                Toast.makeText(AutoClickerService.this, "失败: " + error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } else {
+                executeAutoClickTask();
+            }
         }
         return START_STICKY;
     }
