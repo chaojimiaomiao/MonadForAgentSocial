@@ -34,10 +34,11 @@ public class AiDailyService {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
-     * 完整流程：先生成日报，再下载图片
+     * 完整流程：先生成日报，再下载图片。使用coze改版后：每日在8：25分固定链接下载一张图
      */
     public void generateAndDownload(Context context, OnCompleteListener listener) {
-        executor.execute(() -> {
+        downloadLatest(context,listener);//coze版本
+        /*executor.execute(() -> {
             try {
                 // 第一步：触发生成（GET）
                 String generateUrl = BASE_URL + "/generate?date=" + getTodayDate();
@@ -45,21 +46,8 @@ public class AiDailyService {
 
                 String generateResponse = httpGet(generateUrl);
                 Log.d(TAG, "Generate response: " + generateResponse);
-
-                // 解析JSON，获取图片URL
-                /*String imageUrl = parseImageUrl(generateResponse);
-                if (imageUrl == null) {
-                    // 如果JSON解析失败，用默认路径
-                    imageUrl = BASE_URL + "/latestimg";
-                }*/
-
-                // 等待2秒确保生成完成（服务器需要时间截图+裁剪）
-                Thread.sleep(2000);
-
-                // 第二步：下载图片
                 Log.d(TAG, "Downloading: " + BASE_URL + "/latestimg");
                 Bitmap bitmap = downloadBitmap(BASE_URL + "/latestimg");
-
                 // 保存到本地相册
                 if (bitmap != null) {
                     String savedPath = saveToGallery(context, bitmap, "daily_post_" + getTodayDate() + ".png");
@@ -81,7 +69,7 @@ public class AiDailyService {
                         listener.onError(e.getMessage());
                 });
             }
-        });
+        });*/
     }
 
     /**
@@ -90,13 +78,9 @@ public class AiDailyService {
     public void downloadLatest(Context context, OnCompleteListener listener) {
         executor.execute(() -> {
             try {
-                String imageUrl = BASE_URL + "/latestimg";
-                Log.d(TAG, "Downloading latest: " + imageUrl);
-
-                Bitmap bitmap = downloadBitmap(imageUrl);
-
+                Bitmap bitmap = downloadBitmap("https://www.coze.cn/s/jkXlqjjW2D8/");
                 if (bitmap != null) {
-                    String savedPath = saveToGallery(context, bitmap, "daily_post_latest.png");
+                    String savedPath = saveToGallery(context, bitmap, "ai_daily_latest.png");
                     mainHandler.post(() -> {
                         if (listener != null)
                             listener.onSuccess(savedPath, bitmap);

@@ -251,7 +251,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 return;
             }
 
-            String title = "梦核科技AI日报 | " + getCurrentDate();
+            String title = "梦核科技AI早报 | " + getCurrentDate();
 
             // 步骤2: 查找当前聚焦的输入框
             List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
@@ -270,7 +270,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                     Toast.makeText(this, "标题填写成功", Toast.LENGTH_SHORT).show();
                     //
                     node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
-
                     node.recycle();
                     break;
                 }
