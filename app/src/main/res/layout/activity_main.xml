@@ -110,7 +110,7 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:layout_marginLeft="6dp"
-                android:text="生成下载"
+                android:text="图文下载"
                 android:textSize="14sp"
                 android:textColor="@color/teal_500"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />

@@ -240,10 +240,8 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
     private void S9fillTitle() {
         Toast.makeText(this, "填写标题", Toast.LENGTH_SHORT).show();
-
         // 步骤1: 点击"填写标题"输入框位置激活它
         clickAt(220f, 970f);  // 输入框大约在屏幕上方45%位置
-
         handler.postDelayed(() -> {
             AccessibilityNodeInfo rootNode = getRootInActiveWindow();
             if (rootNode == null) {
@@ -281,6 +279,39 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
             Toast.makeText(this, "收起键盘", Toast.LENGTH_SHORT).show();
+
+            handler.postDelayed(() -> s10fillContent(), 3000);
+
+        }, 3000);
+    }
+
+    private void s10fillContent() {
+        Toast.makeText(this, "填写内容", Toast.LENGTH_SHORT).show();
+        clickAt(220f, 970f);
+        handler.postDelayed(() -> {
+            AccessibilityNodeInfo rootNode = getRootInActiveWindow();
+            if (rootNode == null) {
+                Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // 步骤2: 查找当前聚焦的输入框
+            List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
+            collectAllNodes(rootNode, allNodes);
+
+            for (AccessibilityNodeInfo node : allNodes) {
+                // 查找可编辑且已聚焦的节点
+                if (node.isEditable() && node.isFocused()) {
+                    node.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+                    node.performAction(AccessibilityNodeInfo.ACTION_PASTE);
+                    Toast.makeText(this, "内容填写成功", Toast.LENGTH_SHORT).show();
+                    //
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLEAR_FOCUS);
+                    node.recycle();
+                    break;
+                }
+            }
+
+            rootNode.recycle();
 
             // 步骤4: 直接点击右上角发表
             handler.postDelayed(() -> clickYoushangFabiao(), 3000);

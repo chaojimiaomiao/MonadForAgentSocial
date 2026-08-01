@@ -1,10 +1,14 @@
 package com.example.autoclickhelper;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Html;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -23,6 +27,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AiDailyService {
 
@@ -37,6 +43,17 @@ public class AiDailyService {
      * 完整流程：先生成日报，再下载图片。使用coze改版后：每日在8：25分固定链接下载一张图
      */
     public void generateAndDownload(Context context, OnCompleteListener listener) {
+        downloadTextAndCopy(context, new OnTextCompleteListener() {
+            @Override
+            public void onSuccess(String text) {
+                Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(context, "复制失败", Toast.LENGTH_LONG).show();
+            }
+        });
         downloadLatest(context,listener);//coze版本
         /*executor.execute(() -> {
             try {
@@ -102,6 +119,38 @@ public class AiDailyService {
         });
     }
 
+    public void downloadTextAndCopy(Context context, OnTextCompleteListener listener) {
+        executor.execute(() -> {
+            try {
+                String html = httpGet("https://www.coze.cn/s/wV2QV_B7DIA/");
+                String text = extractTextFromHtml(html);
+                mainHandler.post(() -> {
+                    copyToClipboard(context, text);
+                    if (listener != null) {
+                        listener.onSuccess(text);
+                    }
+                });
+            } catch (Exception e) {
+                mainHandler.post(() -> {
+                    if (listener != null) {
+                        listener.onError(e.getMessage());
+                    }
+                });
+            }
+        });
+    }
+    public interface OnTextCompleteListener {
+        void onSuccess(String text);
+        void onError(String error);
+    }
+
+    private void copyToClipboard(Context context, String text) {
+        ClipboardManager clipboard =
+                (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("贴图号正文", text);
+        clipboard.setPrimaryClip(clip);
+    }
+
     // === 网络请求 ===
 
     private String httpGet(String urlString) throws IOException {
@@ -119,7 +168,7 @@ public class AiDailyService {
             StringBuilder response = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
-                response.append(line);
+                response.append(line).append('\n');
             }
             reader.close();
             return response.toString();
@@ -213,6 +262,26 @@ public class AiDailyService {
             return file.getAbsolutePath();
         }
         return null;
+    }
+
+    private String extractTextFromHtml(String html) throws IOException {
+        Pattern pattern = Pattern.compile(
+                "<pre\\b[^>]*>(.*?)</pre>",
+                Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+        );
+
+        Matcher matcher = pattern.matcher(html);
+        if (!matcher.find()) {
+            throw new IOException("没有找到正文内容");
+        }
+        /*String preHtml = matcher.group(1);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(
+                    preHtml,
+                    Html.FROM_HTML_MODE_LEGACY
+            ).toString();
+        }*/
+        return matcher.group(1).trim();
     }
 
     // === 回调接口 ===
