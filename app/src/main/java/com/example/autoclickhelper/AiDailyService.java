@@ -377,11 +377,13 @@ public class AiDailyService {
 
             images.add(new RundownImage(imageUrl, alt));
         }
-
+        String summary = summaryNode != null
+                ? summaryNode.wholeText().trim()
+                : "";
         return new RundownPage(
                 document.title(),
                 headingNode.text(),
-                summaryNode.text(),
+                summary,
                 footerNode.text(),
                 images
         );
