@@ -35,14 +35,15 @@ public class AutoClickerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && "execute_task".equals(intent.getStringExtra("action"))) {
+            int imgCount = intent.getIntExtra("img_count", 1);
             String source = intent.getStringExtra("source");
             if ("alarm".equals(source)) {
-                new AiDailyService().generateAndDownload(this, new
+                new AiDailyService().downloadPicAndTxt(this, MainActivity.mySummary, new
                         AiDailyService.OnCompleteListener() {
                             @Override
                             public void onSuccess(String savedPath, Bitmap bitmap) {
                                 Toast.makeText(AutoClickerService.this, "日报已保存: " + savedPath, Toast.LENGTH_SHORT).show();
-                                executeAutoClickTask();
+                                executeAutoClickTask(1);
                             }
                             @Override
                             public void onError(String error) {
@@ -50,7 +51,7 @@ public class AutoClickerService extends Service {
                             }
                         });
             } else {
-                executeAutoClickTask();
+                executeAutoClickTask(imgCount);
             }
         }
         return START_STICKY;
@@ -95,7 +96,7 @@ public class AutoClickerService extends Service {
         startForeground(1, notification);
     }
 
-    private void executeAutoClickTask() {
-        AutoClickerAccessibilityService.executeAutoPostTask();
+    private void executeAutoClickTask(int imgCount) {
+        AutoClickerAccessibilityService.executeAutoPostTask(imgCount);
     }
 }

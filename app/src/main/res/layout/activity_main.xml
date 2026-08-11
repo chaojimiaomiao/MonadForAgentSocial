@@ -2,417 +2,345 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp"
         android:background="@color/white"
-        android:elevation="4dp">
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_title"
+            android:textColor="@color/black"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:background="@color/teal_500"
         android:gravity="center_vertical"
-        android:padding="8dp"
-        android:background="@color/teal_500">
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <View
             android:id="@+id/service_status_dot"
             android:layout_width="10dp"
             android:layout_height="10dp"
-            android:background="@drawable/dot_failed"
-            android:layout_marginLeft="16dp" />
+            android:layout_marginLeft="16dp"
+            android:background="@drawable/dot_failed" />
 
         <TextView
             android:id="@+id/service_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:text="@string/status_stopped"
-            android:textSize="12sp"
             android:textColor="@color/white"
-            android:layout_marginLeft="8dp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="8dp"
         android:background="@color/white"
-        android:padding="16dp"
-        android:layout_margin="8dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/task_title"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/task_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="08:00"
-                android:textSize="12sp"
-                android:textColor="@color/green_500" />
+                android:textColor="@color/green_500"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="@string/task_desc"
-            android:textSize="12sp"
             android:textColor="@color/grey_600"
-            android:layout_marginTop="4dp" />
+            android:textSize="12sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_set_time"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="设置时间"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_generate_download"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
+                android:layout_weight="1"
                 android:text="图文下载"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_execute_task"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:text="@string/btn_start_task"
-                android:textSize="14sp"
                 android:backgroundTint="@color/teal_500"
+                android:text="@string/btn_start_task"
                 android:textColor="@color/white"
-                android:layout_marginLeft="8dp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="8dp"
         android:background="@color/white"
-        android:padding="16dp"
-        android:layout_margin="8dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="企业公众号"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/task_time1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="08:00"
-                android:textSize="12sp"
-                android:textColor="@color/green_500" />
+                android:textColor="@color/green_500"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_set_time1"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="设置时间"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
-                android:id="@+id/btn_generate_download1"
+                android:id="@+id/btn_download_rundownAI"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
+                android:layout_weight="1"
                 android:text="图文下载"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_execute_task1"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:text="@string/btn_start_task"
-                android:textSize="14sp"
                 android:backgroundTint="@color/teal_500"
+                android:text="@string/btn_start_task"
                 android:textColor="@color/white"
-                android:layout_marginLeft="8dp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="8dp"
         android:background="@color/white"
-        android:padding="16dp"
-        android:layout_margin="8dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="个人贴图号"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/task_time2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="08:00"
-                android:textSize="12sp"
-                android:textColor="@color/green_500" />
+                android:textColor="@color/green_500"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_set_time2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="设置时间"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_generate_download2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
+                android:layout_weight="1"
                 android:text="图文下载"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_execute_task2"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:text="@string/btn_start_task"
-                android:textSize="14sp"
                 android:backgroundTint="@color/teal_500"
+                android:text="@string/btn_start_task"
                 android:textColor="@color/white"
-                android:layout_marginLeft="8dp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="8dp"
         android:background="@color/white"
-        android:padding="16dp"
-        android:layout_margin="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="个人视频号"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:id="@+id/task_time3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="08:00"
-                android:textSize="12sp"
-                android:textColor="@color/green_500" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="6dp">
-
-            <Button
-                android:id="@+id/btn_set_time3"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="设置时间"
-                android:textSize="14sp"
-                android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-            <Button
-                android:id="@+id/btn_generate_download3"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_marginLeft="6dp"
-                android:text="图文下载"
-                android:textSize="14sp"
-                android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-            <Button
-                android:id="@+id/btn_execute_task3"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="@string/btn_start_task"
-                android:textSize="14sp"
-                android:backgroundTint="@color/teal_500"
-                android:textColor="@color/white"
-                android:layout_marginLeft="8dp" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/white"
-        android:padding="16dp"
-        android:layout_margin="8dp">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="小红书"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/black" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/task_time4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="08:00"
-                android:textSize="12sp"
-                android:textColor="@color/green_500" />
+                android:textColor="@color/green_500"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_set_time4"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="设置时间"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_generate_download4"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
+                android:layout_weight="1"
                 android:text="图文下载"
-                android:textSize="14sp"
                 android:textColor="@color/teal_500"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_execute_task4"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:text="@string/btn_start_task"
-                android:textSize="14sp"
                 android:backgroundTint="@color/teal_500"
+                android:text="@string/btn_start_task"
                 android:textColor="@color/white"
-                android:layout_marginLeft="8dp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -424,28 +352,28 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="16dp">
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_settings"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
             android:text="设置权限"
-            android:textSize="14sp"
             android:textColor="@color/teal_500"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/btn_toggle_service"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:layout_marginLeft="8dp"
             android:layout_weight="2"
-            android:text="@string/btn_start_service"
             android:backgroundTint="@color/teal_500"
-            android:textColor="@color/white"
-            android:layout_marginLeft="8dp" />
+            android:text="@string/btn_start_service"
+            android:textColor="@color/white" />
     </LinearLayout>
 
 </LinearLayout>

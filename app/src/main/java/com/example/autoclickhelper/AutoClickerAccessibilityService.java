@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +29,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     private static boolean isExecuting = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private int screenHeight, screenWidth;
+    private int imageCount = 1;
 
     @Override
     public void onCreate() {
@@ -66,33 +68,22 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         return isRunning && instance != null;
     }
 
-    public static void executeAutoPostTask() {
+    public static void executeAutoPostTask(int imgCount) {
         if (instance == null)
             return;
 
-        /*new AiDailyService().generateAndDownload(instance, new
-                AiDailyService.OnCompleteListener() {
-                    @Override
-                    public void onSuccess(String savedPath, Bitmap bitmap) {
-                        Toast.makeText(instance, "日报已保存: " + savedPath, Toast.LENGTH_LONG).show();
-                    }
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(instance, "失败: " + error, Toast.LENGTH_LONG).show();
-                    }
-        });*/
-        instance.startAutoPostTask();
+        instance.startAutoPostTask(imgCount);
     }
 
-    private void startAutoPostTask() {
+    private void startAutoPostTask(int imgCount) {
         Toast.makeText(this, "startAutoPostTask: ", Toast.LENGTH_SHORT).show();
         /*if (isExecuting)
             return;*/
         isExecuting = true;
-        openPublicAccountHelper();
+        openPublicAccountHelper(imgCount);
     }
 
-    private void openPublicAccountHelper() {//step1
+    private void openPublicAccountHelper(int imgCount) {//step1
         try {
             Intent intent = getPackageManager().getLaunchIntentForPackage("com.tencent.mp");
             if (intent == null) {
@@ -105,6 +96,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        imageCount = imgCount;
         handler.postDelayed(() -> clickText("贴图"), 3000);
     }
 
@@ -159,16 +151,16 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
     private void clickSecondImage() {
         Toast.makeText(this, "选中图片", Toast.LENGTH_SHORT).show();
-//        GestureDescription.Builder builder = new GestureDescription.Builder();
-//        Path path = new android.graphics.Path();
-//        path.moveTo(20, 200);
-//        builder.addStroke(new GestureDescription.StrokeDescription(path, 0, 100));
-//        dispatchGesture(builder.build(), null, null);
-        clickAt(50, 800);
-        //currentStep = 4;
-        handler.postDelayed(() -> {
-            checkDotImage();
-        }, 3000);
+        if (imageCount == 1) {
+            clickAt(50, 800);
+            //currentStep = 4;
+            handler.postDelayed(() -> {
+                checkDotImage();
+            }, 3000);
+
+        } else if (imageCount == 5) {
+            clickFiveImageDot();
+        }
     }
 
     private void checkDotImage() {
@@ -186,8 +178,9 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
 
     private void clickAlbumImageCheckbox(AccessibilityNodeInfo root) {
         Toast.makeText(this, "点击圆点", Toast.LENGTH_SHORT).show();
-        List<AccessibilityNodeInfo> checkboxes = root.findAccessibilityNodeInfosByViewId("android:id/checkbox");
-        if (!checkboxes.isEmpty()) {
+        List<AccessibilityNodeInfo> checkboxes = root.findAccessibilityNodeInfosByViewId("com.tencent.mp:id/check_view");
+        performClick(checkboxes.get(0));
+        /*if (!checkboxes.isEmpty()) {
             int targetIndex = checkboxes.size() > 3 ? 3 : 0;
             AccessibilityNodeInfo checkbox = checkboxes.get(targetIndex);
             performClick(checkbox);
@@ -224,7 +217,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                     return;
                 }
             }
-        }
+        }*/
     }
 
     private void collectAllNodes(AccessibilityNodeInfo root, List<AccessibilityNodeInfo> result) {
@@ -248,9 +241,12 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             String title = "梦核科技AI早报 | " + getCurrentDate();
-
+            if (imageCount == 5) {
+                title = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE
+                ).getString("rundown_title", "玩偶Agents晚报: " + getCurrentDate()
+                ) + " | " + getCurrentDate();
+            }
             // 步骤2: 查找当前聚焦的输入框
             List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
             collectAllNodes(rootNode, allNodes);
@@ -375,7 +371,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
     }
 
     private String getCurrentDate() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM月dd日", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("M.d", Locale.getDefault());
         return sdf.format(new Date());
     }
 
@@ -426,5 +422,68 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 // 被打断（来电、弹窗等）
             }
         }, null);
+    }
+
+    //获取方格位置并排序
+    private void clickFiveImageDot() {
+        AccessibilityNodeInfo root = getRootInActiveWindow();
+        if (root == null) {
+            Toast.makeText(this, "相册页面未加载", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        List<AccessibilityNodeInfo> dots =
+                root.findAccessibilityNodeInfosByViewId(
+                        "com.tencent.mp:id/check_view"
+                );
+        if (dots.size() < 5) {
+            root.recycle();
+            Toast.makeText(
+                    this,
+                    "圆点数量不足: " + dots.size(),
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+        // 按从上到下、从左到右排序
+        dots.sort((a, b) -> {
+            Rect rectA = new Rect();
+            Rect rectB = new Rect();
+            a.getBoundsInScreen(rectA);
+            b.getBoundsInScreen(rectB);
+            if (Math.abs(rectA.top - rectB.top) < 20) {
+                return Integer.compare(rectA.left, rectB.left);
+            }
+            return Integer.compare(rectA.top, rectB.top);
+        });
+        List<Rect> targets = new ArrayList<>();
+        // 只检查相册前五张图片对应的圆点
+        for (int i = 0; i < 5; i++) {
+            AccessibilityNodeInfo dot = dots.get(i);
+
+            // 已选中的圆点不要再次点击，否则会取消
+            if (!dot.isChecked()) {
+                Rect bounds = new Rect();
+                dot.getBoundsInScreen(bounds);
+                targets.add(bounds);
+            }
+        }
+        root.recycle();
+        // 点击的是圆点中心，而不是图片格子中心
+        for (int i = 0; i < targets.size(); i++) {
+            Rect target = new Rect(targets.get(i));
+
+            handler.postDelayed(
+                    () -> clickAt(
+                            target.centerX(),
+                            target.centerY()
+                    ),
+                    i * 600L
+            );
+        }
+        long nextDelay = targets.size() * 600L + 1500L;
+        handler.postDelayed(
+                () -> clickText("下一步"),
+                nextDelay
+        );
     }
 }

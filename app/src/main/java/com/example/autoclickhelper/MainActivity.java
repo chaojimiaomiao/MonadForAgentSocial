@@ -12,9 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView taskTime;
     private SharedPreferences prefs;
     private boolean isServiceRunning = false;
+    public static String mySummary = "https://www.coze.cn/s/wV2QV_B7DIA/";//我的梦核日报
+    public static String myDailyPic = "https://www.coze.cn/s/jkXlqjjW2D8/";
+    public String rundownPic = "https://jv4596c5br.coze.site/";//短链不更新：https://www.coze.cn/s/B10zAJt228c/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         serviceStatus = findViewById(R.id.service_status);
         serviceStatusDot = findViewById(R.id.service_status_dot);
         btnToggleService = findViewById(R.id.btn_toggle_service);
-        btnExecuteTask = findViewById(R.id.btn_execute_task);
+        btnExecuteTask = findViewById(R.id.btn_execute_task);//此处是发布贴图号
         taskTime = findViewById(R.id.task_time);
 
         Button btnSetTime = findViewById(R.id.btn_set_time);
@@ -52,17 +54,36 @@ public class MainActivity extends AppCompatActivity {
         taskTime.setText(time);
 
         btnToggleService.setOnClickListener(v -> toggleService());
-        btnExecuteTask.setOnClickListener(v -> executeTask());
+        btnExecuteTask.setOnClickListener(v -> executeTask(1));
         btnSetTime.setOnClickListener(v -> showTimePicker());
         btnSettings.setOnClickListener(v -> openSettings());
+        //此处是发企业公众号
+        findViewById(R.id.btn_execute_task1).setOnClickListener(v -> executeTask(5));
 
         aiDailyService = new AiDailyService();
         generateDownloadPic();
+        downloadRundownPic();
+    }
+
+    private void downloadRundownPic() {
+        findViewById(R.id.btn_download_rundownAI).setOnClickListener(v -> {
+            aiDailyService.downloadPicAndTxt(this, rundownPic, new
+                    AiDailyService.OnCompleteListener() {
+                        @Override
+                        public void onSuccess(String savedPath, Bitmap bitmap) {
+                            Toast.makeText(MainActivity.this, "日报已保存: " + savedPath, Toast.LENGTH_SHORT).show();
+                        }
+                        @Override
+                        public void onError(String error) {
+                            Toast.makeText(MainActivity.this, "失败: " + error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        });
     }
 
     private void generateDownloadPic() {
         findViewById(R.id.btn_generate_download).setOnClickListener(v -> {
-            aiDailyService.generateAndDownload(this, new
+            aiDailyService.downloadPicAndTxt(this, mySummary, new
                     AiDailyService.OnCompleteListener() {
                         @Override
                         public void onSuccess(String savedPath, Bitmap bitmap) {
@@ -97,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             btnToggleService.setText(R.string.btn_stop_service);
         } else {
             serviceStatus.setText(R.string.status_stopped);
-            serviceStatusDot.setBackgroundResource(R.drawable.dot_failed);
+            serviceStatusDot.setBackgroundResource(R.drawable.dot_pending);
             btnToggleService.setText(R.string.btn_start_service);
         }
     }
@@ -115,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         updateServiceStatus();
     }
 
-    private void executeTask() {
+    private void executeTask(int imgCount) {
         if (!AutoClickerAccessibilityService.isRunning()) {
             Toast.makeText(this, "请先开启无障碍权限", Toast.LENGTH_SHORT).show();
             return;
@@ -123,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, AutoClickerService.class);
         intent.putExtra("action", "execute_task");
+        intent.putExtra("img_count", imgCount);
         startService(intent);
 
         Toast.makeText(this, "开始执行任务", Toast.LENGTH_SHORT).show();

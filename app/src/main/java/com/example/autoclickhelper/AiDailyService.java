@@ -5,16 +5,20 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,16 +29,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.util.ArrayList;
+import java.util.List;
 public class AiDailyService {
-
     private static final String TAG = "AiDaily";
     private static final String BASE_URL = "https://aidaily.modao.xyz";
-
     // 线程池处理网络请求
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -42,60 +47,65 @@ public class AiDailyService {
     /**
      * 完整流程：先生成日报，再下载图片。使用coze改版后：每日在8：25分固定链接下载一张图
      */
-    public void generateAndDownload(Context context, OnCompleteListener listener) {
-        downloadTextAndCopy(context, new OnTextCompleteListener() {
-            @Override
-            public void onSuccess(String text) {
-                Toast.makeText(context, text, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onError(String error) {
-                Toast.makeText(context, "复制失败", Toast.LENGTH_LONG).show();
-            }
-        });
-        downloadLatest(context,listener);//coze版本
-        /*executor.execute(() -> {
-            try {
-                // 第一步：触发生成（GET）
-                String generateUrl = BASE_URL + "/generate?date=" + getTodayDate();
-                Log.d(TAG, "Generating: " + generateUrl);
-
-                String generateResponse = httpGet(generateUrl);
-                Log.d(TAG, "Generate response: " + generateResponse);
-                Log.d(TAG, "Downloading: " + BASE_URL + "/latestimg");
-                Bitmap bitmap = downloadBitmap(BASE_URL + "/latestimg");
-                // 保存到本地相册
-                if (bitmap != null) {
-                    String savedPath = saveToGallery(context, bitmap, "daily_post_" + getTodayDate() + ".png");
-                    mainHandler.post(() -> {
-                        if (listener != null)
-                            listener.onSuccess(savedPath, bitmap);
-                    });
-                } else {
-                    mainHandler.post(() -> {
-                        if (listener != null)
-                            listener.onError("图片下载失败");
-                    });
+    public void downloadPicAndTxt(Context context, String url, OnCompleteListener listener) {
+        if (url.equals(MainActivity.mySummary)) {
+            downloadTextAndCopy(context, url, new OnTextCompleteListener() {
+                @Override
+                public void onSuccess(String text) {
+                    Toast.makeText(context, text, Toast.LENGTH_LONG).show();
                 }
 
-            } catch (Exception e) {
-                Log.e(TAG, "Error", e);
-                mainHandler.post(() -> {
-                    if (listener != null)
-                        listener.onError(e.getMessage());
-                });
-            }
-        });*/
+                @Override
+                public void onError(String error) {
+                    Toast.makeText(context, "复制失败", Toast.LENGTH_LONG).show();
+                }
+            });
+            downloadLatestOnePic(context,listener);//梦核版本
+        } else {
+            executor.execute(() -> {
+                try {
+                    String html = httpGet(url);
+                    RundownPage page = parseRundownHtml(html, url);
+                    int index = 1;
+                    for (RundownImage image : page.images) {
+                        Bitmap bitmap = downloadBitmap(image.url);
+
+                        String filename = String.format(Locale.CHINA,
+                                "rundown_ai_%02d.png",
+                                index++
+                        );
+
+                        saveToGallery(context, bitmap, filename);
+                        bitmap.recycle();
+                    }
+                    String publishTitle = page.heading;
+                    context.getSharedPreferences(
+                                    "AutoClickHelper", Context.MODE_PRIVATE).edit()
+                            .putString("rundown_title", publishTitle)
+                            .apply();
+                    mainHandler.post(() -> {
+                        copyToClipboard(context, "玩偶 Agents 晚报：\n" + page.summary);
+                        listener.onSuccess(page.images.size() +","+ page.summary,
+                                null
+                        );
+                    });
+                } catch (Exception e) {
+                    mainHandler.post(() ->
+                            listener.onError(e.getMessage())
+                    );
+                }
+            });
+        }
+
     }
 
     /**
      * 只下载最新图片（不重新生成）
      */
-    public void downloadLatest(Context context, OnCompleteListener listener) {
+    public void downloadLatestOnePic(Context context, OnCompleteListener listener) {
         executor.execute(() -> {
             try {
-                Bitmap bitmap = downloadBitmap("https://www.coze.cn/s/jkXlqjjW2D8/");
+                Bitmap bitmap = downloadBitmap(MainActivity.myDailyPic);
                 if (bitmap != null) {
                     String savedPath = saveToGallery(context, bitmap, "ai_daily_latest.png");
                     mainHandler.post(() -> {
@@ -119,10 +129,10 @@ public class AiDailyService {
         });
     }
 
-    public void downloadTextAndCopy(Context context, OnTextCompleteListener listener) {
+    public void downloadTextAndCopy(Context context, String url, OnTextCompleteListener listener) {
         executor.execute(() -> {
             try {
-                String html = httpGet("https://www.coze.cn/s/wV2QV_B7DIA/");
+                String html = httpGet(url);
                 String text = extractTextFromHtml(html);
                 mainHandler.post(() -> {
                     copyToClipboard(context, text);
@@ -296,81 +306,88 @@ public class AiDailyService {
     public void shutdown() {
         executor.shutdown();
     }
+
+
+    private static class RundownImage {
+        final String url;
+        final String alt;
+
+        RundownImage(String url, String alt) {
+            this.url = url;
+            this.alt = alt;
+        }
+    }
+
+    private static class RundownPage {
+        final String title;
+        final String heading;
+        final String summary;
+        final String footer;
+        final List<RundownImage> images;
+
+        RundownPage(
+                String title,
+                String heading,
+                String summary,
+                String footer,
+                List<RundownImage> images) {
+            this.title = title;
+            this.heading = heading;
+            this.summary = summary;
+            this.footer = footer;
+            this.images = images;
+        }
+    }
+
+    private RundownPage parseRundownHtml(
+            String html,
+            String pageUrl) throws IOException {
+
+        Document document = Jsoup.parse(html, pageUrl);
+
+        Element container = document.selectFirst("body > div.container");
+        if (container == null) {
+            throw new IOException("缺少 div.container");
+        }
+
+        Element headingNode = container.selectFirst("div.header > h1");
+        Element summaryNode = container.selectFirst("div.header > div.sub");
+        Element footerNode = container.selectFirst("div.footer");
+
+        if (headingNode == null || summaryNode == null || footerNode == null) {
+            throw new IOException("页面标题、摘要或页脚结构不完整");
+        }
+
+        Elements imageNodes =
+                container.select("div.card-img > img[src]");
+
+        if (imageNodes.isEmpty()) {
+            throw new IOException("没有找到日报图片");
+        }
+
+        List<RundownImage> images = new ArrayList<>();
+
+        for (Element imageNode : imageNodes) {
+            String imageUrl = imageNode.absUrl("src");
+            String alt = imageNode.attr("alt").trim();
+
+            if (imageUrl.isEmpty()) {
+                throw new IOException("存在空的图片地址");
+            }
+
+            images.add(new RundownImage(imageUrl, alt));
+        }
+
+        return new RundownPage(
+                document.title(),
+                headingNode.text(),
+                summaryNode.text(),
+                footerNode.text(),
+                images
+        );
+    }
+
+
+
+
 }
-
-// === 使用示例（Activity中） ===
-
-/*
- * public class MainActivity extends AppCompatActivity {
- * 
- * private AiDailyService aiDailyService;
- * 
- * @Override
- * protected void onCreate(Bundle savedInstanceState) {
- * super.onCreate(savedInstanceState);
- * setContentView(R.layout.activity_main);
- * 
- * aiDailyService = new AiDailyService();
- * 
- * // 点击按钮：生成并下载日报
- * findViewById(R.id.btn_generate).setOnClickListener(v -> {
- * aiDailyService.generateAndDownload(this, new
- * AiDailyService.OnCompleteListener() {
- * 
- * @Override
- * public void onSuccess(String savedPath, Bitmap bitmap) {
- * Toast.makeText(MainActivity.this,
- * "日报已保存: " + savedPath, Toast.LENGTH_LONG).show();
- * 
- * // 显示到ImageView
- * ImageView imageView = findViewById(R.id.imageView);
- * imageView.setImageBitmap(bitmap);
- * }
- * 
- * @Override
- * public void onError(String error) {
- * Toast.makeText(MainActivity.this,
- * "失败: " + error, Toast.LENGTH_LONG).show();
- * }
- * });
- * });
- * 
- * // 点击按钮：只下载最新（不重新生成）
- * findViewById(R.id.btn_download).setOnClickListener(v -> {
- * aiDailyService.downloadLatest(this, new AiDailyService.OnCompleteListener() {
- * 
- * @Override
- * public void onSuccess(String savedPath, Bitmap bitmap) {
- * Toast.makeText(MainActivity.this,
- * "已下载: " + savedPath, Toast.LENGTH_LONG).show();
- * }
- * 
- * @Override
- * public void onError(String error) {
- * Toast.makeText(MainActivity.this,
- * "失败: " + error, Toast.LENGTH_LONG).show();
- * }
- * });
- * });
- * }
- * 
- * @Override
- * protected void onDestroy() {
- * super.onDestroy();
- * aiDailyService.shutdown();
- * }
- * }
- */
-
-// === AndroidManifest.xml 权限 ===
-
-/*
- * <uses-permission android:name="android.permission.INTERNET" />
- * <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
- * 
- * <!-- Android 9及以下需要存储权限 -->
- * <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
- * android:maxSdkVersion="28" />
- * <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
- * android:maxSdkVersion="28" />
- */
