@@ -132,6 +132,15 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 case "更多设置":
                     toggleGroupNotification();
                     break;
+                case "链接或合集":
+                    handler.postDelayed(() -> clickText("添加合集"), 2000);
+                    break;
+                case "添加合集":
+                    handler.postDelayed(() -> clickText("玩偶rundown晚报"), 3000);
+                    break;
+                case "玩偶rundown晚报":
+                    handler.postDelayed(() -> S9fillTitle(), 3000);
+                    break;
                 case "发表":
                     //currentStep = 11;
                     Toast.makeText(this, "完毕。", Toast.LENGTH_SHORT).show();
@@ -145,7 +154,11 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         //clickAt(screenWidth * 0.9f, screenHeight * 0.9f);
         clickAt(950, 2250);
         handler.postDelayed(() -> {
-            clickText("更多设置");
+            if (imageCount == 5) {
+                clickText("链接或合集");
+            } else {
+                clickText("更多设置");
+            }
         }, 4000);
     }
 
@@ -180,44 +193,6 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         Toast.makeText(this, "点击圆点", Toast.LENGTH_SHORT).show();
         List<AccessibilityNodeInfo> checkboxes = root.findAccessibilityNodeInfosByViewId("com.tencent.mp:id/check_view");
         performClick(checkboxes.get(0));
-        /*if (!checkboxes.isEmpty()) {
-            int targetIndex = checkboxes.size() > 3 ? 3 : 0;
-            AccessibilityNodeInfo checkbox = checkboxes.get(targetIndex);
-            performClick(checkbox);
-            checkbox.recycle();
-            return;
-        }
-        List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
-        collectAllNodes(root, allNodes);
-        for (AccessibilityNodeInfo node : allNodes) {
-            String className = node.getClassName().toString();
-            if ((className.contains("CheckBox") || className.contains("check")) && node.isClickable()) {
-                performClick(node);
-                node.recycle();
-                return;
-            }
-        }
-        for (AccessibilityNodeInfo node : allNodes) {
-            if (node.isClickable() && node.getContentDescription() != null) {
-                String desc = node.getContentDescription().toString();
-                if (desc.contains("选择") || desc.contains("check")) {
-                    performClick(node);
-                    node.recycle();
-                    return;
-                }
-            }
-        }
-        for (AccessibilityNodeInfo node : allNodes) {
-            if (node.isClickable()) {
-                Rect bounds = new Rect();
-                node.getBoundsInScreen(bounds);
-                if (bounds.right > screenWidth * 0.8 && bounds.top < screenHeight * 0.3) {
-                    performClick(node);
-                    node.recycle();
-                    return;
-                }
-            }
-        }*/
     }
 
     private void collectAllNodes(AccessibilityNodeInfo root, List<AccessibilityNodeInfo> result) {

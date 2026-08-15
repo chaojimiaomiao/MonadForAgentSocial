@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isServiceRunning = false;
     public static String mySummary = "https://www.coze.cn/s/wV2QV_B7DIA/";//我的梦核日报
     public static String myDailyPic = "https://www.coze.cn/s/jkXlqjjW2D8/";
-    public String rundownPic = "https://jv4596c5br.coze.site/";//短链不更新：https://www.coze.cn/s/B10zAJt228c/
+    public String rundownPic = "https://www.coze.cn/s/kvnK52EmRX8/";
+        //"https://jv4596c5br.coze.site/";//短链不更新：https://www.coze.cn/s/B10zAJt228c/
 
 
     @Override
