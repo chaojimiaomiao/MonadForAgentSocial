@@ -132,14 +132,23 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 case "更多设置":
                     toggleGroupNotification();
                     break;
+                case "赞赏设置":
+                    handler.postDelayed(() -> clickText("小猫姬"), 2000);
+                    break;
+                case "小猫姬":
+                    handler.postDelayed(() -> clickText("确定"), 1000);
+                    break;
+                case "确定":
+                    handler.postDelayed(() -> clickText("链接或合集"), 2000);
+                    break;
                 case "链接或合集":
                     handler.postDelayed(() -> clickText("添加合集"), 2000);
                     break;
                 case "添加合集":
-                    handler.postDelayed(() -> clickText("玩偶rundown晚报"), 3000);
+                    handler.postDelayed(() -> clickText("玩偶rundown晚报"), 1500);
                     break;
                 case "玩偶rundown晚报":
-                    handler.postDelayed(() -> S9fillTitle(), 3000);
+                    handler.postDelayed(() -> S9fillTitle(), 1500);
                     break;
                 case "发表":
                     //currentStep = 11;
@@ -155,7 +164,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         clickAt(950, 2250);
         handler.postDelayed(() -> {
             if (imageCount == 5) {
-                clickText("链接或合集");
+                clickText("赞赏设置");
             } else {
                 clickText("更多设置");
             }
