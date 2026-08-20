@@ -225,11 +225,13 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
                 return;
             }
-            String title = "梦核科技AI早报 | " + getCurrentDate();
+            String title = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE
+            ).getString("daily_title", "梦核科技AI早报") + " | ";
+            
             if (imageCount == 5) {
                 title = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE
                 ).getString("rundown_title", "玩偶Agents晚报: " + getCurrentDate()
-                ) + " | " + getCurrentDate();
+                );
             }
             // 步骤2: 查找当前聚焦的输入框
             List<AccessibilityNodeInfo> allNodes = new java.util.ArrayList<>();
@@ -312,46 +314,13 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
         clickAt(930, 450);
         handler.postDelayed(() -> {
             clickBack();
-        }, 4000);
+        }, 2500);
     }
 
     private void clickBack() {
         Toast.makeText(this, "返回", Toast.LENGTH_SHORT).show();
         clickAt(88, 220);
         handler.postDelayed(() -> S9fillTitle(), 4000);
-    }
-
-    private void toggleGroupNotification1() {
-        AccessibilityNodeInfo rootNode = getRootInActiveWindow();
-        if (rootNode == null) {
-            Toast.makeText(this, "root空", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // 方式1: 查找"群发通知"文字，然后点击它右边的区域
-        List<AccessibilityNodeInfo> textNodes = rootNode.findAccessibilityNodeInfosByText("群发通知");
-        if (!textNodes.isEmpty()) {
-            AccessibilityNodeInfo textNode = textNodes.get(0);
-            Rect textBounds = new Rect();
-            textNode.getBoundsInScreen(textBounds);
-
-            // 点击文字右侧（toggle位置）
-            int toggleX = textBounds.right + 100;
-            int toggleY = textBounds.centerY();
-            clickAt(toggleX, toggleY);
-        }
-
-        // 方式2: 直接点击屏幕右侧位置（兜底）
-        else {
-            //clickAt(screenWidth * 0.85f, screenHeight * 0.15f);
-            clickAt(930, 450);
-        }
-
-        rootNode.recycle();
-
-        handler.postDelayed(() -> {
-            clickAt(50, 200);  // 返回
-        }, 3500);
     }
 
     private String getCurrentDate() {

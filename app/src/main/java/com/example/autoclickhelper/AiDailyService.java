@@ -17,7 +17,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import java.io.BufferedReader;
@@ -84,7 +86,9 @@ public class AiDailyService {
                             .putString("rundown_title", publishTitle)
                             .apply();
                     mainHandler.post(() -> {
-                        copyToClipboard(context, "玩偶 Agents 晚报：\n" + page.summary);
+                        SimpleDateFormat sdf = new SimpleDateFormat("M.d日", Locale.getDefault());
+                        String sdfStr = sdf.format(new Date());
+                        copyToClipboard(context, sdfStr + " 玩偶 Agents 晚报：\n" + page.summary);
                         listener.onSuccess(page.images.size() +","+ page.summary,
                                 null
                         );
@@ -134,6 +138,9 @@ public class AiDailyService {
             try {
                 String html = httpGet(url);
                 String text = extractTextFromHtml(html);
+                String title = Jsoup.parse(html).title();
+                context.getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE)
+                        .edit().putString("daily_title", title).apply();
                 mainHandler.post(() -> {
                     copyToClipboard(context, text);
                     if (listener != null) {
