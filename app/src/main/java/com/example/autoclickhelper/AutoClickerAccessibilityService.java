@@ -226,7 +226,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
                 return;
             }
             String title = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE
-            ).getString("daily_title", "梦核科技AI早报") + " | ";
+            ).getString("daily_title", "梦核科技AI早报 | " +getCurrentDate());
             
             if (imageCount == 5) {
                 title = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE

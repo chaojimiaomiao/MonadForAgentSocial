@@ -86,8 +86,7 @@ public class AiDailyService {
                             .putString("rundown_title", publishTitle)
                             .apply();
                     mainHandler.post(() -> {
-                        SimpleDateFormat sdf = new SimpleDateFormat("M.d日", Locale.getDefault());
-                        String sdfStr = sdf.format(new Date());
+                        String sdfStr = getCurrentDay();
                         copyToClipboard(context, sdfStr + " 玩偶 Agents 晚报：\n" + page.summary);
                         listener.onSuccess(page.images.size() +","+ page.summary,
                                 null
@@ -101,6 +100,11 @@ public class AiDailyService {
             });
         }
 
+    }
+
+    private String getCurrentDay() {
+        SimpleDateFormat sdf = new SimpleDateFormat("M.d日", Locale.getDefault());
+        return sdf.format(new Date());
     }
 
     /**
@@ -137,7 +141,7 @@ public class AiDailyService {
         executor.execute(() -> {
             try {
                 String html = httpGet(url);
-                String text = extractTextFromHtml(html);
+                String text = getCurrentDay() + extractTextFromHtml(html);
                 String title = Jsoup.parse(html).title();
                 context.getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE)
                         .edit().putString("daily_title", title).apply();
