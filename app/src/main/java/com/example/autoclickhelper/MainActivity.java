@@ -96,6 +96,19 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         });
+        findViewById(R.id.btn_generate_download2).setOnClickListener(v -> {//个人贴图号下载链接 mySummary，改这就行，就是一张图的逻辑
+            aiDailyService.downloadPicAndTxt(this, mySummary, new
+                    AiDailyService.OnCompleteListener() {
+                        @Override
+                        public void onSuccess(String savedPath, Bitmap bitmap) {
+                            Toast.makeText(MainActivity.this, "日报已保存: " + savedPath, Toast.LENGTH_SHORT).show();
+                        }
+                        @Override
+                        public void onError(String error) {
+                            Toast.makeText(MainActivity.this, "失败: " + error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        });
     }
 
     @Override

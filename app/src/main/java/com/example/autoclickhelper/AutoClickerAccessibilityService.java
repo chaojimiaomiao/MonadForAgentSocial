@@ -230,7 +230,7 @@ public class AutoClickerAccessibilityService extends AccessibilityService {
             
             if (imageCount == 5) {
                 title = getSharedPreferences("AutoClickHelper", Context.MODE_PRIVATE
-                ).getString("rundown_title", "玩偶Agents晚报: " + getCurrentDate()
+                ).getString("rundown_title", "梦核Agents晚报: " + getCurrentDate()
                 );
             }
             // 步骤2: 查找当前聚焦的输入框

@@ -50,6 +50,7 @@ public class AiDailyService {
      * 完整流程：先生成日报，再下载图片。使用coze改版后：每日在8：25分固定链接下载一张图
      */
     public void downloadPicAndTxt(Context context, String url, OnCompleteListener listener) {
+        downloadLatestOnePic(context,listener);//梦核版本
         if (url.equals(MainActivity.mySummary)) {
             downloadTextAndCopy(context, url, new OnTextCompleteListener() {
                 @Override
@@ -62,7 +63,7 @@ public class AiDailyService {
                     Toast.makeText(context, "复制失败", Toast.LENGTH_LONG).show();
                 }
             });
-            downloadLatestOnePic(context,listener);//梦核版本
+
         } else {
             executor.execute(() -> {
                 try {
