@@ -29,9 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView taskTime;
     private SharedPreferences prefs;
     private boolean isServiceRunning = false;
-    public static String mySummary = "https://www.coze.cn/s/wV2QV_B7DIA/";//我的梦核日报
-    public static String myDailyPic = "https://www.coze.cn/s/jkXlqjjW2D8/";
-    public String rundownPic = "https://www.coze.cn/s/kvnK52EmRX8/";
+    //https://www.coze.cn/s/wV2QV_B7DIA/
+    public static String mySummary = "https://feishu.doubao.com/drive/file/HZEDbIzUyou6h0x4zQscYMpZnCc";//我的梦核日报
+    //原来coze的链接是 https://www.coze.cn/s/jkXlqjjW2D8/
+    public static String myDailyPic = "https://aka.doubaocdn.com/s/hj6yamGrqd";
+    public String rundownPic = "https://www.coze.cn/s/03tED20qSjA/";//这个链接似乎每个月过期一回
         //"https://jv4596c5br.coze.site/";//短链不更新：https://www.coze.cn/s/B10zAJt228c/
 
 
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         downloadRundownPic();
     }
 
-    private void downloadRundownPic() {
+    private void downloadRundownPic() {//5张贴图号
         findViewById(R.id.btn_download_rundownAI).setOnClickListener(v -> {
             aiDailyService.downloadPicAndTxt(this, rundownPic, new
                     AiDailyService.OnCompleteListener() {
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void generateDownloadPic() {
+    private void generateDownloadPic() {//单张贴图号
         findViewById(R.id.btn_generate_download).setOnClickListener(v -> {
             aiDailyService.downloadPicAndTxt(this, mySummary, new
                     AiDailyService.OnCompleteListener() {

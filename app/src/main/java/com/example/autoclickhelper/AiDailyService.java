@@ -52,17 +52,17 @@ public class AiDailyService {
     public void downloadPicAndTxt(Context context, String url, OnCompleteListener listener) {
         downloadLatestOnePic(context,listener);//梦核版本
         if (url.equals(MainActivity.mySummary)) {
-            downloadTextAndCopy(context, url, new OnTextCompleteListener() {
-                @Override
-                public void onSuccess(String text) {
-                    Toast.makeText(context, text, Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onError(String error) {
-                    Toast.makeText(context, "复制失败", Toast.LENGTH_LONG).show();
-                }
-            });
+//            downloadTextAndCopy(context, url, new OnTextCompleteListener() {
+//                @Override
+//                public void onSuccess(String text) {
+//                    Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+//                }
+//
+//                @Override
+//                public void onError(String error) {
+//                    Toast.makeText(context, "复制失败", Toast.LENGTH_LONG).show();
+//                }
+//            });
 
         } else {
             executor.execute(() -> {
@@ -72,12 +72,10 @@ public class AiDailyService {
                     int index = 1;
                     for (RundownImage image : page.images) {
                         Bitmap bitmap = downloadBitmap(image.url);
-
                         String filename = String.format(Locale.CHINA,
                                 "rundown_ai_%02d.png",
                                 index++
                         );
-
                         saveToGallery(context, bitmap, filename);
                         bitmap.recycle();
                     }
